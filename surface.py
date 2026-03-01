@@ -32,7 +32,7 @@ class Surface:
         # Calculate magnitude of lift and apply direction
         q = 0.5 * self.rho * np.linalg.norm(v_air) ** 2
         Cl = self.Cla * alpha
-        Cd = self.Cda * alpha + self.Cd0
+        Cd = abs(self.Cda * alpha) + self.Cd0
         F_drag = q * self.S * Cd * v_air_hat # Drag is same direction as air
         F_lift = q * self.S * Cl * lift_dir
 

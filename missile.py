@@ -24,13 +24,13 @@ class Missile:
         self.gravity_world = np.array([0, 0, self.mass * 9.81])
 
         # Fins
-        self.fin_y = Surface(5.0, 0.0, 0.1, np.array([-0.12, 0, 0]),
+        self.fin_y = Surface(5.0, 0.57, 0.1, np.array([-0.12, 0, 0]),
             np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.0018)
-        self.fin_z = Surface(5.0, 0.0, 0.1, np.array([-0.12, 0, 0]),
+        self.fin_z = Surface(5.0, 0.57, 0.1, np.array([-0.12, 0, 0]),
             np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.0018)
-        self.canard_y = Surface(5.0, 0.0, 0.1, np.array([0.14, 0, 0]),
+        self.canard_y = Surface(5.0, 0.57, 0.01, np.array([0.14, 0, 0]),
             np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.0008)
-        self.canard_z = Surface(5.0, 0.0, 0.1, np.array([0.14, 0, 0]),
+        self.canard_z = Surface(5.0, 0.57, 0.01, np.array([0.14, 0, 0]),
             np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.0008)
 
         # Motor
