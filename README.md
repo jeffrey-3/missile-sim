@@ -1,5 +1,9 @@
 # Missile Simulator
 
+![](missile-sim.gif)
+
+## How to run
+
 1. Create the virtual environment
 
 ```sh
