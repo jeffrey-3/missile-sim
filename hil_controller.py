@@ -27,11 +27,11 @@ class HILController(Controller):
             deflection_range = np.rad(10.0)
             line[0] = np.clamp(line[0], min_pulse, max_pulse)
             line[1] = np.clamp(line[1], min_pulse, max_pulse)
-            servo_y_angle = (line[0] - middle_pulse) / pulse_range
+            self.servo_y_angle = (line[0] - middle_pulse) / pulse_range
                 * deflection_range
-            servo_z_angle = (line[1] - middle_pulse) / pulse_range
+            self.servo_z_angle = (line[1] - middle_pulse) / pulse_range
                 * deflection_range
         except ValueError:
             print("Parse error:", line)
 
-        return servo_y_angle, servo_z_angle
+        return self.servo_y_angle, self.servo_z_angle
