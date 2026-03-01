@@ -4,6 +4,7 @@ import threading
 import time
 from missile import Missile
 from target import Target
+from controller import Controller
 from plot import Plot
 
 missile = Missile()
@@ -14,12 +15,9 @@ target = Target()
 target.pos = np.array([-150.0, -50.0, -200.0])
 target.vel = np.array([50, 0, 0])
 
-def simulator(queue):
-    # Show initial position for a second before starting
-    for i in range(10):
-        queue.put((missile.pos, missile.rot, target.pos))
-    time.sleep(1)
+controller = Controller()
 
+def simulator(queue):
     dt = 0.01
     start_time = time.perf_counter()
     last_time = time.perf_counter()
@@ -30,19 +28,8 @@ def simulator(queue):
         if elapsed_time < dt:
             time.sleep(dt - elapsed_time)
 
-        # Update target
         target.update(dt)
-
-        # Find error to target
-        to_target_world = target.pos - missile.pos
-        to_target_body = missile.world_to_body(to_target_world)
-        pitch_error = np.arctan2(-to_target_body[2], to_target_body[0])
-        yaw_error = np.arctan2(to_target_body[1], to_target_body[0])
-
-        # P controller
-        u1 = pitch_error * 0.1
-        u2 = yaw_error * 0.1
-
+        u1, u2 = controller.update(missile, target)
         missile.update(u1, u2, dt, time.perf_counter() - start_time)
 
         queue.put((missile.pos, missile.rot, target.pos))
