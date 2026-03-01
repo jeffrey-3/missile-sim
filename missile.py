@@ -27,17 +27,32 @@ class Missile:
         self.gravity_world = np.array([0, 0, self.mass * 9.81])
 
     def update(self, canard_y_angle, canard_z_angle, dt, time_elapsed):
+        # Set canard deflection angles
         self.set_canard_angles(canard_y_angle, canard_z_angle)
+
+        # Get aerodynamic forces
         aero_force_body, moment = self.compute_force_moment()
+
+        # Add motor thrust
         aero_force_body += self.get_thrust_body(time_elapsed)
-        force_world = self.body_to_world(aero_force_body) + self.gravity_world
+
+        # Rotate force to world frame
+        force_world = self.body_to_world(aero_force_body)
+
+        # Add gravity
+        force_world += self.gravity_world
+
+        # Calculate linear acceleration
         self.accel_world = force_world / self.mass
+
+        # Calculate angular acceleration from aerodynamic moments
+        angular_accel = np.matmul(np.linalg.inv(self.inertia_tensor), moment)
+
+        # Propagate kinematics
         self.vel += self.accel_world * dt
         self.pos += self.vel * dt
-        angular_accel = np.matmul(np.linalg.inv(self.inertia_tensor), moment)
         self.omega += angular_accel * dt
-        delta_rot = Rotation.from_rotvec(self.omega * dt)
-        self.rot = self.rot * delta_rot
+        self.rot *= Rotation.from_rotvec(self.omega * dt)
 
     def set_canard_angles(self, canard_y_angle, canard_z_angle):
         y_canard_normal = np.array([0, 0, 1])
