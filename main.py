@@ -18,7 +18,7 @@ target.vel = np.array([0, 0, 0])
 controller = Controller()
 
 def simulator(queue):
-    dt = 0.01
+    dt = 0.005
     iteration = 0
     start_time = time.perf_counter()
     while True:
