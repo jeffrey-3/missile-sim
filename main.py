@@ -27,7 +27,7 @@ missile.set_euler(np.array([np.radians(0.0), np.radians(90.0),
     np.radians(0.0)]))
 
 target = Target()
-target.pos = np.array([-100.0, -50.0, -150.0])
+target.pos = np.array([50.0, -50.0, -150.0])
 target.vel = np.array([0, 0, 0])
 
 def simulator(queue):
