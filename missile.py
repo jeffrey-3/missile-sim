@@ -9,6 +9,7 @@ class Missile:
     def __init__(self):
         self.pos = np.zeros(3)
         self.vel = np.zeros(3)
+        self.accel_world = np.zeros(3)
         self.rot = Rotation.identity()
         self.omega = np.zeros(3)
         self.mass = 0.3
@@ -23,15 +24,15 @@ class Missile:
             np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.01)
         self.motor_lut_time = np.array([0.0, 1.0, 2.0, 3.0])
         self.motor_lut_thrust = np.array([30.0, 50.0, 10.0, 0.0])
+        self.gravity_world = np.array([0, 0, self.mass * 9.81])
 
     def update(self, canard_y_angle, canard_z_angle, dt, time_elapsed):
         self.set_canard_angles(canard_y_angle, canard_z_angle)
-        aero_force, moment = self.compute_force_moment()
-        force_body = aero_force + self.get_thrust_body(time_elapsed)
-        force_world = self.body_to_world(force_body)
-        gravity_world = np.array([0, 0, self.mass * 9.81])
-        linear_accel = (force_world + gravity_world) / self.mass
-        self.vel += linear_accel * dt
+        aero_force_body, moment = self.compute_force_moment()
+        aero_force_body += self.get_thrust_body(time_elapsed)
+        force_world = self.body_to_world(aero_force_body) + self.gravity_world
+        self.accel_world = force_world / self.mass
+        self.vel += self.accel_world * dt
         self.pos += self.vel * dt
         angular_accel = np.matmul(np.linalg.inv(self.inertia_tensor), moment)
         self.omega += angular_accel * dt
