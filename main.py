@@ -13,34 +13,29 @@ missile.set_euler(np.array([np.radians(0.0), np.radians(90.0),
 
 target = Target()
 target.pos = np.array([-150.0, -50.0, -200.0])
-target.vel = np.array([50, 0, 0])
+target.vel = np.array([0, 0, 0])
 
 controller = Controller()
 
 def simulator(queue):
     dt = 0.01
+    iteration = 0
     start_time = time.perf_counter()
-    last_time = time.perf_counter()
-    while time.perf_counter() - start_time < 100:
-        current_time = time.perf_counter()
-        elapsed_time = current_time - last_time
+    while True:
+        if time.perf_counter() < start_time + iteration * dt:
+            time.sleep(0.0001)
+            continue
 
-        if elapsed_time < dt:
-            time.sleep(dt - elapsed_time)
-
+        iteration += 1
         target.update(dt)
         u1, u2 = controller.update(missile, target)
-        missile.update(u1, u2, dt, time.perf_counter() - start_time)
-
+        missile.update(u1, u2, dt, iteration * dt)
         queue.put((missile.pos, missile.rot, target.pos))
 
-        last_time = current_time
-
 queue = queue.Queue()
-
-plot = Plot(queue, 150)
 
 thread = threading.Thread(target=simulator, args=(queue,), daemon=True)
 thread.start()
 
+plot = Plot(queue, 150)
 plot.start()
