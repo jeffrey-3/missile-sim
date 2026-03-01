@@ -4,8 +4,23 @@ import threading
 import time
 from missile import Missile
 from target import Target
-from controller import Controller
 from plot import Plot
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--pid", action="store_true", help="Use PID controller")
+parser.add_argument("--hil", action="store_true", help="Enable HIL testing")
+args = parser.parse_args()
+
+if args.pid:
+    from pid_controller import PIDController
+    controller = PIDController()
+elif args.hil:
+    from hil_controller import HILController
+    controller = HILController("/dev/ttyACM0", 115200)
+else:
+    from pid_controller import PIDController
+    controller = PIDController()
 
 missile = Missile()
 missile.set_euler(np.array([np.radians(0.0), np.radians(90.0),
@@ -14,8 +29,6 @@ missile.set_euler(np.array([np.radians(0.0), np.radians(90.0),
 target = Target()
 target.pos = np.array([-150.0, -50.0, -200.0])
 target.vel = np.array([0, 0, 0])
-
-controller = Controller()
 
 def simulator(queue):
     dt = 0.005
