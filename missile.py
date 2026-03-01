@@ -14,6 +14,7 @@ class Missile:
         self.accel_world = np.zeros(3)
         self.rot = Rotation.identity()
         self.omega = np.zeros(3)
+        self.accel_imu = np.zeros(3)
 
         # Properties
         self.mass = 0.3
