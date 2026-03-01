@@ -13,42 +13,14 @@ class Missile:
         self.omega = np.zeros(3)
         self.mass = 0.3
         self.inertia_tensor = np.diag(np.array([0.01, 0.05, 0.05]))
-        self.fin_y = Surface(
-            5.0,
-            0.05,
-            0.03,
-            np.array([-0.1, 0, 0]),
-            np.array([-1, 0, 0]),
-            np.array([0, 0, 1]),
-            0.05
-        )
-        self.fin_z = Surface(
-            5.0,
-            0.05,
-            0.03,
-            np.array([-0.1, 0, 0]),
-            np.array([-1, 0, 0]),
-            np.array([0, 1, 0]),
-            0.05
-        )
-        self.canard_y = Surface(
-            5.0,
-            0.0,
-            0.01,
-            np.array([0.05, 0, 0]),
-            np.array([-1, 0, 0]),
-            np.array([0, 0, 1]),
-            0.01
-        )
-        self.canard_z = Surface(
-            5.0,
-            0.0,
-            0.01,
-            np.array([0.05, 0, 0]),
-            np.array([-1, 0, 0]),
-            np.array([0, 1, 0]),
-            0.01
-        )
+        self.fin_y = Surface(5.0, 0.05, 0.03, np.array([-0.1, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.05)
+        self.fin_z = Surface(5.0, 0.05, 0.03, np.array([-0.1, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.05)
+        self.canard_y = Surface(5.0, 0.0, 0.01, np.array([0.05, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.01)
+        self.canard_z = Surface(5.0, 0.0, 0.01, np.array([0.05, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.01)
         self.motor_lut_time = np.array([0.0, 1.0, 2.0, 3.0])
         self.motor_lut_thrust = np.array([30.0, 50.0, 10.0, 0.0])
 
@@ -79,11 +51,8 @@ class Missile:
         self.canard_z.fin_normal = self.normalize(z_canard_normal)
 
     def get_thrust_body(self, time_elapsed):
-        thrust = np.interp(
-            time_elapsed,
-            self.motor_lut_time,
-            self.motor_lut_thrust
-        )
+        thrust = np.interp(time_elapsed, self.motor_lut_time,
+            self.motor_lut_thrust)
         return np.array([thrust, 0, 0])
 
     def set_euler(self, euler):
@@ -100,25 +69,15 @@ class Missile:
 
     def compute_force_moment(self):
         force_fin_y, moment_fin_y = self.fin_y.compute_force_moment(
-            self.world_to_body(self.vel),
-            self.omega
-        )
+            self.world_to_body(self.vel), self.omega)
         force_fin_z, moment_fin_z = self.fin_z.compute_force_moment(
-            self.world_to_body(self.vel),
-            self.omega
-        )
+            self.world_to_body(self.vel), self.omega)
         force_canard_y, moment_canard_y = self.canard_y.compute_force_moment(
-            self.world_to_body(self.vel),
-            self.omega
-        )
+            self.world_to_body(self.vel), self.omega)
         force_canard_z, moment_canard_z = self.canard_z.compute_force_moment(
-            self.world_to_body(self.vel),
-            self.omega
-        )
-        return (
-            force_fin_y + force_fin_z + force_canard_y + force_canard_z,
-            moment_fin_y + moment_fin_z + moment_canard_y + moment_canard_z
-        )
+            self.world_to_body(self.vel), self.omega)
+        return (force_fin_y + force_fin_z + force_canard_y + force_canard_z,
+            moment_fin_y + moment_fin_z + moment_canard_y + moment_canard_z)
 
     def normalize(self, v):
         n = np.linalg.norm(v)
