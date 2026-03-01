@@ -3,19 +3,21 @@ import queue
 import threading
 import time
 from missile import Missile
+from target import Target
 from plot import Plot
 
 missile = Missile()
-missile.set_euler(
-    np.array([np.radians(0.0), np.radians(90.0), np.radians(0.0)])
-)
+missile.set_euler(np.array([np.radians(0.0), np.radians(90.0),
+    np.radians(0.0)]))
+
+target = Target()
+target.pos = np.array([-150.0, -50.0, -200.0])
+target.vel = np.array([50, 0, 0])
 
 def simulator(queue):
-    target_pos = np.array([-150.0, -50.0, -200.0])
-
     # Show initial position for a second before starting
     for i in range(10):
-        queue.put((missile.pos, missile.rot, target_pos))
+        queue.put((missile.pos, missile.rot, target.pos))
     time.sleep(1)
 
     dt = 0.01
@@ -29,10 +31,10 @@ def simulator(queue):
             time.sleep(dt - elapsed_time)
 
         # Update target
-        target_pos[0] += 80 * dt
+        target.update(dt)
 
         # Find error to target
-        to_target_world = target_pos - missile.pos
+        to_target_world = target.pos - missile.pos
         to_target_body = missile.world_to_body(to_target_world)
         pitch_error = np.arctan2(-to_target_body[2], to_target_body[0])
         yaw_error = np.arctan2(to_target_body[1], to_target_body[0])
@@ -43,7 +45,7 @@ def simulator(queue):
 
         missile.update(u1, u2, dt, time.perf_counter() - start_time)
 
-        queue.put((missile.pos, missile.rot, target_pos))
+        queue.put((missile.pos, missile.rot, target.pos))
 
         last_time = current_time
 
