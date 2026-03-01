@@ -66,6 +66,18 @@ class Missile:
             z_canard_normal = rot_z.apply(z_canard_normal)
         self.canard_z.fin_normal = self.normalize(z_canard_normal)
 
+    def compute_force_moment(self):
+        force_fin_y, moment_fin_y = self.fin_y.compute_force_moment(
+            self.world_to_body(self.vel), self.omega)
+        force_fin_z, moment_fin_z = self.fin_z.compute_force_moment(
+            self.world_to_body(self.vel), self.omega)
+        force_canard_y, moment_canard_y = self.canard_y.compute_force_moment(
+            self.world_to_body(self.vel), self.omega)
+        force_canard_z, moment_canard_z = self.canard_z.compute_force_moment(
+            self.world_to_body(self.vel), self.omega)
+        return (force_fin_y + force_fin_z + force_canard_y + force_canard_z,
+            moment_fin_y + moment_fin_z + moment_canard_y + moment_canard_z)
+
     def get_thrust_body(self, time_elapsed):
         thrust = np.interp(time_elapsed, self.motor_lut_time,
             self.motor_lut_thrust)
@@ -82,18 +94,6 @@ class Missile:
 
     def world_to_body(self, v):
         return self.rot.inv().apply(v)
-
-    def compute_force_moment(self):
-        force_fin_y, moment_fin_y = self.fin_y.compute_force_moment(
-            self.world_to_body(self.vel), self.omega)
-        force_fin_z, moment_fin_z = self.fin_z.compute_force_moment(
-            self.world_to_body(self.vel), self.omega)
-        force_canard_y, moment_canard_y = self.canard_y.compute_force_moment(
-            self.world_to_body(self.vel), self.omega)
-        force_canard_z, moment_canard_z = self.canard_z.compute_force_moment(
-            self.world_to_body(self.vel), self.omega)
-        return (force_fin_y + force_fin_z + force_canard_y + force_canard_z,
-            moment_fin_y + moment_fin_z + moment_canard_y + moment_canard_z)
 
     def normalize(self, v):
         n = np.linalg.norm(v)
