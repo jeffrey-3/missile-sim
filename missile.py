@@ -33,6 +33,10 @@ class Missile:
         self.canard_z = Surface(5.0, 0.57, 0.01, np.array([0.14, 0, 0]),
             np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.0008)
 
+        # Nose
+        self.nose = Surface(0.0, 0.0, 0.5, np.array([0, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.00342)
+
         # Motor
         self.motor = Motor()
 
@@ -91,8 +95,11 @@ class Missile:
             self.world_to_body(self.vel), self.omega)
         force_canard_z, moment_canard_z = self.canard_z.compute_force_moment(
             self.world_to_body(self.vel), self.omega)
-        return (force_fin_y + force_fin_z + force_canard_y + force_canard_z,
-            moment_fin_y + moment_fin_z + moment_canard_y + moment_canard_z)
+        force_nose, moment_nose = self.nose.compute_force_moment(
+            self.world_to_body(self.vel), self.omega)
+        return (force_fin_y + force_fin_z + force_canard_y + force_canard_z +
+                force_nose, moment_fin_y + moment_fin_z + moment_canard_y +
+                moment_canard_z)
 
     def set_euler(self, euler):
         self.rot = Rotation.from_euler('xyz', euler)
