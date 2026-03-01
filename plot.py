@@ -16,9 +16,8 @@ class Plot:
         self.fig = plt.figure("Simulation")
         canvas = self.fig.canvas
         self.ax = self.fig.add_subplot(111, projection='3d')
-        for cid, func in list(
-            canvas.callbacks.callbacks.get('button_press_event', {}).items()
-        ):
+        for cid, func in list(canvas.callbacks.callbacks.get(
+            'button_press_event', {}).items()):
             canvas.mpl_disconnect(cid)
         self.ax.set_xlim(-self.limits, self.limits)
         self.ax.set_ylim(-self.limits, self.limits)
@@ -78,11 +77,6 @@ class Plot:
             self.target, self.target_line)
 
     def start(self):
-        ani = FuncAnimation(
-            self.fig,
-            self.update,
-            blit=True,
-            interval=33,
-            cache_frame_data=False
-        )
+        ani = FuncAnimation(self.fig, self.update, blit=True, interval=33,
+            cache_frame_data=False)
         plt.show()
