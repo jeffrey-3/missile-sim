@@ -4,16 +4,25 @@ from surface import Surface
 import numpy as np
 from scipy.spatial.transform import Rotation
 from surface import Surface
+from motor import Motor
 
 class Missile:
     def __init__(self):
+        # Pose
         self.pos = np.zeros(3)
         self.vel = np.zeros(3)
         self.accel_world = np.zeros(3)
         self.rot = Rotation.identity()
         self.omega = np.zeros(3)
+
+        # Properties
         self.mass = 0.3
         self.inertia_tensor = np.diag(np.array([0.01, 0.05, 0.05]))
+
+        # Environment
+        self.gravity_world = np.array([0, 0, self.mass * 9.81])
+
+        # Fins
         self.fin_y = Surface(5.0, 0.05, 0.03, np.array([-0.1, 0, 0]),
             np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.05)
         self.fin_z = Surface(5.0, 0.05, 0.03, np.array([-0.1, 0, 0]),
@@ -22,9 +31,9 @@ class Missile:
             np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.01)
         self.canard_z = Surface(5.0, 0.0, 0.01, np.array([0.05, 0, 0]),
             np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.01)
-        self.motor_lut_time = np.array([0.0, 1.0, 2.0, 3.0])
-        self.motor_lut_thrust = np.array([30.0, 50.0, 10.0, 0.0])
-        self.gravity_world = np.array([0, 0, self.mass * 9.81])
+
+        # Motor
+        self.motor = Motor()
 
     def update(self, canard_y_angle, canard_z_angle, dt, time_elapsed):
         # Set canard deflection angles
@@ -34,7 +43,7 @@ class Missile:
         aero_force_body, moment = self.compute_force_moment()
 
         # Add motor thrust
-        aero_force_body += self.get_thrust_body(time_elapsed)
+        aero_force_body += self.motor.get_thrust_body(time_elapsed)
 
         # Rotate force to world frame
         force_world = self.body_to_world(aero_force_body)
@@ -77,11 +86,6 @@ class Missile:
             self.world_to_body(self.vel), self.omega)
         return (force_fin_y + force_fin_z + force_canard_y + force_canard_z,
             moment_fin_y + moment_fin_z + moment_canard_y + moment_canard_z)
-
-    def get_thrust_body(self, time_elapsed):
-        thrust = np.interp(time_elapsed, self.motor_lut_time,
-            self.motor_lut_thrust)
-        return np.array([thrust, 0, 0])
 
     def set_euler(self, euler):
         self.rot = Rotation.from_euler('xyz', euler)
