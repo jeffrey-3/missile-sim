@@ -14,21 +14,34 @@ class Surface:
         self.rho = 1.225
 
     def compute_force_moment(self, v_body, omega_body):
+        # Get velocity of fin including the velocity due to off-axis rotation
         v_fin = v_body + np.cross(omega_body, self.r_fin_body)
-        v_rel = -v_fin
-        v_hat = self.normalize(v_rel)
-        alpha = np.arctan2(np.dot(v_hat, self.fin_normal),
-            np.dot(v_hat, self.fin_chord))
-        drag_dir = v_hat
-        lift_dir = self.normalize(np.cross(np.cross(v_hat, self.fin_normal),
-            v_hat))
-        q = 0.5 * self.rho * np.linalg.norm(v_rel) ** 2
+
+        # Velocity of airflow, in opposite direction of v_fin
+        v_air = -v_fin
+        v_air_hat = self.normalize(v_air)
+
+        # Calculate angle of attack
+        alpha = np.arctan2(np.dot(v_air_hat, self.fin_normal),
+            np.dot(v_air_hat, self.fin_chord))
+
+        # Calculate direction of lift
+        lift_dir = self.normalize(np.cross(np.cross(v_air_hat, self.fin_normal),
+            v_air_hat))
+
+        # Calculate magnitude of lift and apply direction
+        q = 0.5 * self.rho * np.linalg.norm(v_air) ** 2
         Cl = self.Cla * alpha
         Cd = self.Cda * alpha + self.Cd0
-        F_drag = q * self.S * Cd * drag_dir
+        F_drag = q * self.S * Cd * v_air_hat # Drag is same direction as air
         F_lift = q * self.S * Cl * lift_dir
+
+        # Calculate total force
         F_total = F_lift + F_drag
+
+        # Calculate moment
         M = np.cross(self.r_fin_body, F_total)
+
         return F_total, M
 
     def normalize(self, v):
