@@ -18,25 +18,31 @@ class Missile:
 
         # Properties
         self.mass = 0.3
-        self.inertia_tensor = np.diag(np.array([0.01, 0.05, 0.05]))
+        self.inertia_tensor = np.diag(np.array([0.0000408, 0.00226, 0.00226]))
 
         # Environment
         self.gravity_world = np.array([0, 0, self.mass * 9.81])
 
         # Fins
-        self.fin_y = Surface(5.0, 0.05, 0.03, np.array([-0.1, 0, 0]),
-            np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.05)
-        self.fin_z = Surface(5.0, 0.05, 0.03, np.array([-0.1, 0, 0]),
-            np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.05)
-        self.canard_y = Surface(5.0, 0.0, 0.01, np.array([0.05, 0, 0]),
-            np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.01)
-        self.canard_z = Surface(5.0, 0.0, 0.01, np.array([0.05, 0, 0]),
-            np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.01)
+        self.fin_y = Surface(5.0, 0.0, 0.1, np.array([-0.12, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.0018)
+        self.fin_z = Surface(5.0, 0.0, 0.1, np.array([-0.12, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.0018)
+        self.canard_y = Surface(5.0, 0.0, 0.1, np.array([0.14, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 0, 1]), 0.0008)
+        self.canard_z = Surface(5.0, 0.0, 0.1, np.array([0.14, 0, 0]),
+            np.array([-1, 0, 0]), np.array([0, 1, 0]), 0.0008)
 
         # Motor
         self.motor = Motor()
 
     def update(self, canard_y_angle, canard_z_angle, dt, time_elapsed):
+        # Actuator limits
+        canard_y_angle = np.clip(canard_y_angle, -np.deg2rad(10.0),
+            np.deg2rad(10.0))
+        canard_z_angle = np.clip(canard_z_angle, -np.deg2rad(10.0),
+            np.deg2rad(10.0))
+
         # Set canard deflection angles
         self.set_canard_angles(canard_y_angle, canard_z_angle)
 

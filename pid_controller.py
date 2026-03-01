@@ -3,7 +3,7 @@ from controller import Controller
 
 class PIDController(Controller):
     def __init__(self):
-        self.kP = 0.1
+        self.kP = 0.5
 
     def update(self, missile, target):
         to_target_world = target.pos - missile.pos
