@@ -40,7 +40,14 @@ class Missile:
         # Motor
         self.motor = Motor()
 
-    def update(self, canard_y_angle, canard_z_angle, dt, time_elapsed):
+        # Status
+        self.launched = True
+
+    def update(self, canard_y_angle, canard_z_angle, dt, time):
+        # Check motor ignited and launch started
+        if not self.motor.is_ignited(time):
+            return
+
         # Actuator limits
         canard_y_angle = np.clip(canard_y_angle, -np.deg2rad(10.0),
             np.deg2rad(10.0))
@@ -54,7 +61,7 @@ class Missile:
         aero_force_body, moment = self.compute_force_moment()
 
         # Add motor thrust
-        aero_force_body += self.motor.get_thrust_body(time_elapsed)
+        aero_force_body += self.motor.get_thrust_body(time)
 
         # Rotate force to world frame
         force_world = self.body_to_world(aero_force_body)

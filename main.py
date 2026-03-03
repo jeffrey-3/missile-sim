@@ -35,14 +35,17 @@ def simulator(queue):
     iteration = 0
     start_time = time.perf_counter()
     while True:
-        if time.perf_counter() < start_time + iteration * dt:
+        sim_time = iteration * dt
+
+        if time.perf_counter() < start_time + sim_time:
             time.sleep(0.0001)
             continue
 
         iteration += 1
         target.update(dt)
-        u1, u2 = controller.update(missile, target)
-        missile.update(u1, u2, dt, iteration * dt)
+        u1, u2 = controller.update(missile, target, dt)
+        missile.update(u1, u2, dt, sim_time)
+
         queue.put((missile.pos, missile.rot, target.pos))
 
 queue = queue.Queue()
