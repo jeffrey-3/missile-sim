@@ -44,6 +44,8 @@ class Missile:
         self.launched = True
 
     def update(self, canard_y_angle, canard_z_angle, dt, time):
+        self.update_accel_imu()
+
         # Check motor ignited and launch started
         if not self.motor.is_ignited(time):
             return
@@ -107,6 +109,11 @@ class Missile:
         return (force_fin_y + force_fin_z + force_canard_y + force_canard_z +
                 force_nose, moment_fin_y + moment_fin_z + moment_canard_y +
                 moment_canard_z)
+
+    def update_accel_imu(self):
+        proper_accel_world = self.accel_world - np.array([0, 0, 9.81])
+        accel_body = self.world_to_body(proper_accel_world)
+        self.accel_imu = accel_body / 9.81
 
     def set_euler(self, euler):
         self.rot = Rotation.from_euler('xyz', euler)

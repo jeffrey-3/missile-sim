@@ -8,7 +8,7 @@ class HILController(Controller):
         self.servo_y_angle = 0.0
         self.servo_z_angle = 0.0
 
-    def update(self, missile, target):
+    def update(self, missile, target, dt):
         s = (f"{missile.omega[0]:.3f},{missile.omega[1]:.3f},"
              f"{missile.omega[2]:.3f},{missile.accel_imu[0]:.3f},"
              f"{missile.accel_imu[1]:.3f},{missile.accel_imu[2]:.3f}\r")
