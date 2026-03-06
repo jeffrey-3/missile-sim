@@ -37,12 +37,11 @@ def simulator(queue):
     start_time = time.perf_counter()
     while True:
         sim_time = iteration * dt
-
         if time.perf_counter() < start_time + sim_time:
             time.sleep(0.0001)
             continue
-
         iteration += 1
+
         target.update(dt)
         u1, u2 = controller.update(missile, target, dt)
         missile.update(u1, u2, dt, sim_time)
