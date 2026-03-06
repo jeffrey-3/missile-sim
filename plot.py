@@ -27,9 +27,9 @@ class Plot:
         self.ax.invert_zaxis()
         self.ax.view_init(elev=20, azim=135)
         self.line, = self.ax.plot([], [], [], color=(0, 0, 0))
-        self.line_xy, = self.ax.plot([], [], [], color=(0, 0, 0))
-        self.line_xz, = self.ax.plot([], [], [], color=(0, 0, 0))
-        self.line_yz, = self.ax.plot([], [], [], color=(0, 0, 0))
+        self.line_xy, = self.ax.plot([], [], [], color=(0, 0, 0), alpha=0.2)
+        self.line_xz, = self.ax.plot([], [], [], color=(0, 0, 0), alpha=0.2)
+        self.line_yz, = self.ax.plot([], [], [], color=(0, 0, 0), alpha=0.2)
         self.x_axis, = self.ax.plot([], [], [], lw=2, color=(1, 0, 0))
         self.y_axis, = self.ax.plot([], [], [], lw=2, color=(0, 1, 0))
         self.z_axis, = self.ax.plot([], [], [], lw=2, color=(0, 0, 1))
@@ -37,11 +37,11 @@ class Plot:
             linestyle='--')
         self.target, = self.ax.plot([], [], [], color=(0, 0, 0),
             linestyle='none', marker='*', markersize=10)
-        self.target_xy, = self.ax.plot([], [], [], color=(0, 0, 0),
+        self.target_xy, = self.ax.plot([], [], [], color=(0, 0, 0), alpha=0.2,
             linestyle='none', marker='*', markersize=10)
-        self.target_xz, = self.ax.plot([], [], [], color=(0, 0, 0),
+        self.target_xz, = self.ax.plot([], [], [], color=(0, 0, 0), alpha=0.2,
             linestyle='none', marker='*', markersize=10)
-        self.target_yz, = self.ax.plot([], [], [], color=(0, 0, 0),
+        self.target_yz, = self.ax.plot([], [], [], color=(0, 0, 0), alpha=0.2,
             linestyle='none', marker='*', markersize=10)
 
     def get_data(self):
