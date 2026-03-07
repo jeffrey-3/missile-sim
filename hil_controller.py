@@ -16,9 +16,10 @@ class HILController(Controller):
         self.ser.write(s)
 
         line = self.ser.readline()
+        print(line) # Incase there are debug messages
         try:
             line = line.decode("utf-8").strip().split(",")
-            line = [float(v) for v in line]
+            line = [float(line[i]) for i in range(2)]
 
             max_pulse = 2100.0
             min_pulse = 900.0

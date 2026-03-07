@@ -14,7 +14,6 @@ class Plot:
         self.z_data = []
         plt.rcParams['toolbar'] = 'None'
         self.fig = plt.figure("Simulation")
-        plt.get_current_fig_manager().window.showMaximized()
         canvas = self.fig.canvas
         self.ax = self.fig.add_subplot(111, projection='3d')
         self.ax.set_xlim(-self.limits, self.limits)
