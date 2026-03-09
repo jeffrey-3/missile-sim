@@ -8,6 +8,8 @@ class Motor:
         self.ignition_time = 2
 
     def get_thrust_body(self, time):
+        if time < self.ignition_time:
+            return np.array([0.0, 0.0, 0.0])
         thrust = np.interp(time - self.ignition_time, self.lut_time,
             self.lut_thrust)
         return np.array([thrust, 0, 0])

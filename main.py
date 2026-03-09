@@ -6,7 +6,7 @@ from missile import Missile
 from target import Target
 from plot import Plot
 
-ser = serial.Serial("/dev/ttyACM0", 115200)
+ser = serial.Serial("/dev/ttyACM0", 1000000)
 
 missile = Missile()
 missile.set_euler(np.array([np.radians(0.0), np.radians(80.0),
@@ -25,7 +25,6 @@ def simulator(queue):
     while True:
         # Wait for update request and get time information
         line = ser.readline()
-        print(line)
         try:
             arr = line.decode("utf-8").strip().split(",")
             time = float(arr[0]) / 1000 # Convert ms to s
@@ -33,6 +32,7 @@ def simulator(queue):
                 start_time = time
             time -= start_time
             dt = float(arr[1]) / 1000
+            print(time, dt)
 
             max_pulse = 2100.0
             min_pulse = 900.0
@@ -47,7 +47,6 @@ def simulator(queue):
             print("Parse error:", line)
 
         # Update simulator
-        print(u1, u2)
         target.update(dt)
         missile.update(u1, u2, dt, time)
         queue.put((missile.pos, missile.rot, target.pos))
@@ -57,7 +56,6 @@ def simulator(queue):
              f"{missile.omega[2]:.5f},{missile.accel_imu[0]:.5f},"
              f"{missile.accel_imu[1]:.5f},{missile.accel_imu[2]:.5f}\r")
         s = s.encode('utf-8')
-#print(s)
         ser.write(s)
 
 queue = queue.Queue()
