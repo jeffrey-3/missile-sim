@@ -49,7 +49,6 @@ def simulator(queue):
         # Update simulator
         target.update(dt)
         missile.update(u1, u2, dt, time)
-        queue.put((missile.pos, missile.rot, target.pos))
 
         # Send updated sensors to missile
         s = (f"{missile.omega[0]:.5f},{missile.omega[1]:.5f},"
@@ -57,6 +56,9 @@ def simulator(queue):
              f"{missile.accel_imu[1]:.5f},{missile.accel_imu[2]:.5f}\r")
         s = s.encode('utf-8')
         ser.write(s)
+
+        # Add to plot queue
+        queue.put((missile.pos, missile.rot, target.pos))
 
 queue = queue.Queue()
 
