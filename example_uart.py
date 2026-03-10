@@ -23,14 +23,15 @@ def simulator(queue):
         line = ser.readline()
         try:
             # Parse time and actuator information
-            arr = line.decode("utf-8").strip().split(",")
-            time = float(arr[0]) / 1000 # Convert ms to s
+            data = line.decode("utf-8").strip().split(",")
+            time = float(data[0]) / 1000 # Convert ms to s
+            dt = float(data[1]) / 1000
+            canard_y_pulse = int(data[2])
+            canard_z_pulse = int(data[3])
+
             if start_time == None:
                 start_time = time
             time -= start_time
-            dt = float(arr[1]) / 1000
-            canard_y_pulse = int(arr[2])
-            canard_z_pulse = int(arr[3])
         except ValueError:
             print("Parse error:", line)
             break
@@ -42,14 +43,16 @@ def simulator(queue):
 
             # Send updated sensors to missile
             s = (f"{missile.omega[0]:.5f},{missile.omega[1]:.5f},"
-                 f"{missile.omega[2]:.5f},{missile.accel_imu[0]:.5f},"
-                 f"{missile.accel_imu[1]:.5f},{missile.accel_imu[2]:.5f}\r")
+                 f"{missile.omega[2]:.5f},{missile.get_imu_accel()[0]:.5f},"
+                 f"{missile.get_imu_accel()[1]:.5f},"
+                 f"{missile.get_imu_accel()[2]:.5f},"
+                 f"{missile.get_seeker_data(target)[0]:.5f},"
+                 f"{missile.get_seeker_data(target)[1]:.5f}\r")
             s = s.encode('utf-8')
             ser.write(s)
 
             # Add to plot queue
             queue.put((missile.pos, missile.rot, target.pos))
-
 
 queue = queue.Queue()
 

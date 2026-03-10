@@ -11,7 +11,6 @@ class Missile:
         self.accel_world = np.zeros(3)
         self.rot = Rotation.identity()
         self.omega = np.zeros(3)
-        self.accel_imu = np.zeros(3)
 
         # Properties
         self.mass = 0.3
@@ -40,11 +39,7 @@ class Missile:
         # Status
         self.launched = True
 
-        self.update_accel_imu()
-
     def update(self, dt, time):
-        self.update_accel_imu()
-
         # Check motor ignited and launch started
         if not self.motor.is_ignited(time):
             return
@@ -122,10 +117,16 @@ class Missile:
                 force_nose, moment_fin_y + moment_fin_z + moment_canard_y +
                 moment_canard_z)
 
-    def update_accel_imu(self):
+    def get_imu_accel(self):
         proper_accel_world = self.accel_world - np.array([0, 0, 9.81])
         accel_body = self.world_to_body(proper_accel_world)
-        self.accel_imu = accel_body / 9.81
+        return accel_body / 9.81
+
+    def get_seeker_data(self, target):
+        error_body = self.world_to_body(target.pos - self.pos)
+        pitch_error = np.arctan2(-error_body[2], error_body[0])
+        yaw_error = np.arctan2(error_body[1], error_body[0])
+        return pitch_error, yaw_error
 
     def set_euler(self, euler):
         self.rot = Rotation.from_euler('xyz', euler)
