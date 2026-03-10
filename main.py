@@ -23,7 +23,7 @@ def simulator(queue):
     missile.update_accel_imu()
 
     while True:
-        # Wait for update request and get time information
+        # Wait time and actuator information
         line = ser.readline()
         try:
             arr = line.decode("utf-8").strip().split(",")
@@ -32,8 +32,8 @@ def simulator(queue):
                 start_time = time
             time -= start_time
             dt = float(arr[1]) / 1000
-            print(time, dt)
 
+            # Convert servo pulse width to canard deflection in radians
             max_pulse = 2100.0
             min_pulse = 900.0
             middle_pulse = (max_pulse + min_pulse) / 2.0
