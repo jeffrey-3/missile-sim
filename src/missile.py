@@ -1,10 +1,7 @@
 import numpy as np
 from scipy.spatial.transform import Rotation
-from surface import Surface
-import numpy as np
-from scipy.spatial.transform import Rotation
-from surface import Surface
-from motor import Motor
+from src.surface import Surface
+from src.motor import Motor
 
 class Missile:
     def __init__(self):
@@ -43,21 +40,14 @@ class Missile:
         # Status
         self.launched = True
 
-    def update(self, canard_y_angle, canard_z_angle, dt, time):
+        self.update_accel_imu()
+
+    def update(self, dt, time):
         self.update_accel_imu()
 
         # Check motor ignited and launch started
         if not self.motor.is_ignited(time):
             return
-
-        # Actuator limits
-        canard_y_angle = np.clip(canard_y_angle, -np.deg2rad(10.0),
-            np.deg2rad(10.0))
-        canard_z_angle = np.clip(canard_z_angle, -np.deg2rad(10.0),
-            np.deg2rad(10.0))
-
-        # Set canard deflection angles
-        self.set_canard_angles(canard_y_angle, canard_z_angle)
 
         # Get aerodynamic forces
         aero_force_body, moment = self.compute_force_moment()
@@ -83,7 +73,29 @@ class Missile:
         self.omega += angular_accel * dt
         self.rot *= Rotation.from_rotvec(self.omega * dt)
 
+    def set_canard_pulse(self, canard_y_pulse, canard_z_pulse):
+        # Convert servo pulse width to canard deflection in radians
+        max_pulse = 2100.0
+        min_pulse = 900.0
+        middle_pulse = (max_pulse + min_pulse) / 2.0
+        pulse_range = max_pulse - min_pulse
+        deflection_range = np.deg2rad(10.0)
+        canard_y_pulse = np.clip(canard_y_pulse, min_pulse, max_pulse)
+        canard_z_pulse = np.clip(canard_z_pulse, min_pulse, max_pulse)
+        canard_y_angle = (canard_y_pulse - middle_pulse) / (pulse_range *
+            deflection_range)
+        canard_z_angle = (canard_z_pulse - middle_pulse) / (pulse_range *
+            deflection_range)
+
+        self.set_canard_angles(canard_y_angle, canard_z_angle)
+
     def set_canard_angles(self, canard_y_angle, canard_z_angle):
+        # Actuator limits
+        canard_y_angle = np.clip(canard_y_angle, -np.deg2rad(10.0),
+            np.deg2rad(10.0))
+        canard_z_angle = np.clip(canard_z_angle, -np.deg2rad(10.0),
+            np.deg2rad(10.0))
+
         y_canard_normal = np.array([0, 0, 1])
         if abs(canard_y_angle) > 1e-8:
             rot_y = Rotation.from_rotvec([0, canard_y_angle, 0])

@@ -1,7 +1,6 @@
 import numpy as np
-from controller import Controller
 
-class PIDController(Controller):
+class PIDController():
     def __init__(self):
         self.kP = 0.5
         self.kI = 0.0
